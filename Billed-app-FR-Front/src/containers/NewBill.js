@@ -1,6 +1,8 @@
 import { ROUTES_PATH } from '../constants/routes.js'
 import Logout from "./Logout.js"
 
+// isRightFile = false si format de fichier NOK et true si ok
+let isRightFile;
 export default class NewBill {
   constructor({ document, onNavigate, store, localStorage }) {
     this.document = document
@@ -20,45 +22,59 @@ export default class NewBill {
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
-    const formData = new FormData()
-    const email = JSON.parse(localStorage.getItem("user")).email
-    formData.append('file', file)
-    formData.append('email', email)
-
-    this.store
-      .bills()
-      .create({
-        data: formData,
-        headers: {
-          noContentType: true
-        }
-      })
-      .then(({fileUrl, key}) => {
-        console.log(fileUrl)
-        this.billId = key
-        this.fileUrl = fileUrl
-        this.fileName = fileName
-      }).catch(error => console.error(error))
+    // Vérifier si l'extension récupérée est dans la liste des extensions valides
+    const fileExtension = fileName.split(".").pop();
+    if(["jpeg", "jpg", "png"].includes(fileExtension.toLowerCase())) {
+      const formData = new FormData()
+      const email = JSON.parse(localStorage.getItem("user")).email
+      formData.append('file', file)
+      formData.append('email', email)
+      isRightFile = true;
+      
+      return (
+        this.store
+          .bills()
+          .create({
+            data: formData,
+            headers: {
+              noContentType: true
+            }
+          })
+          .then(({fileUrl, key}) => {
+            console.log(fileUrl)
+            this.billId = key
+            this.fileUrl = fileUrl
+            this.fileName = fileName
+          }).catch(error => console.error(error))
+      )
+    } else {
+      isRightFile = false;
+      return alert("Invalid file type, select .png, .jpg or .jpeg file.")
+    }
   }
   handleSubmit = e => {
     e.preventDefault()
-    console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
-    const email = JSON.parse(localStorage.getItem("user")).email
-    const bill = {
-      email,
-      type: e.target.querySelector(`select[data-testid="expense-type"]`).value,
-      name:  e.target.querySelector(`input[data-testid="expense-name"]`).value,
-      amount: parseInt(e.target.querySelector(`input[data-testid="amount"]`).value),
-      date:  e.target.querySelector(`input[data-testid="datepicker"]`).value,
-      vat: e.target.querySelector(`input[data-testid="vat"]`).value,
-      pct: parseInt(e.target.querySelector(`input[data-testid="pct"]`).value) || 20,
-      commentary: e.target.querySelector(`textarea[data-testid="commentary"]`).value,
-      fileUrl: this.fileUrl,
-      fileName: this.fileName,
-      status: 'pending'
+    if(isRightFile === true) {
+      console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
+      const email = JSON.parse(localStorage.getItem("user")).email
+      const bill = {
+        email,
+        type: e.target.querySelector(`select[data-testid="expense-type"]`).value,
+        name:  e.target.querySelector(`input[data-testid="expense-name"]`).value,
+        amount: parseInt(e.target.querySelector(`input[data-testid="amount"]`).value),
+        date:  e.target.querySelector(`input[data-testid="datepicker"]`).value,
+        vat: e.target.querySelector(`input[data-testid="vat"]`).value,
+        pct: parseInt(e.target.querySelector(`input[data-testid="pct"]`).value) || 20,
+        commentary: e.target.querySelector(`textarea[data-testid="commentary"]`).value,
+        fileUrl: this.fileUrl,
+        fileName: this.fileName,
+        status: 'pending'
+      }
+      this.updateBill(bill)
+      this.onNavigate(ROUTES_PATH['Bills'])
+    } else {
+      alert("Remplacez le fichier uploadé par un fichier au fomrat jpg, jpeg ou png.")
     }
-    this.updateBill(bill)
-    this.onNavigate(ROUTES_PATH['Bills'])
   }
 
   // not need to cover this function by tests
