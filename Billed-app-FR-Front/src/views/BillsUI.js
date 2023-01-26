@@ -9,7 +9,7 @@ const row = (bill) => {
     <tr>
       <td>${bill.type}</td>
       <td>${bill.name}</td>
-      <td data-date="${bill.date}">${bill.formatedDate}</td>
+      <td">${bill.date}</td>
       <td>${bill.amount} €</td>
       <td>${bill.status}</td>
       <td data-testid='eye-icon' >

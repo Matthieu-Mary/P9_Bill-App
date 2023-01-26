@@ -5,10 +5,12 @@
 import { screen, waitFor } from "@testing-library/dom";
 import BillsUI from "../views/BillsUI.js";
 import { bills } from "../fixtures/bills.js";
-import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
+import { ROUTES_PATH } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import router from "../app/Router.js";
 import store from "../__mocks__/store.js";
+import Bills from "../containers/Bills.js";
+import userEvent from "@testing-library/user-event";
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -35,20 +37,23 @@ describe("Given I am connected as an employee", () => {
     });
     test("Then bills should be ordered from earliest to latest", () => {
       document.body.innerHTML = BillsUI({ data: bills });
-      const dates = screen.getAllByText().map((a) => a.dataset.date);
+      const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map((a) => a.textContent); 
       const antiChrono = (a, b) => (a < b ? 1 : -1);
       const datesSorted = [...dates].sort(antiChrono);
       expect(dates).toEqual(datesSorted);
     });
     test("Then modal should append and display the right bill document when user click on eye icon", () => {
       document.body.innerHTML = BillsUI({ data: bills });
+      $.fn.modal = jest.fn();
+      const modalSpy = jest.spyOn($.fn, "modal");
       const eyeIcons = screen.getAllByTestId("icon-eye");
-      expect(eyeIcons).toBeTruthy();
+      eyeIcons.map((icon) => userEvent.click(icon));
+      expect(modalSpy).toHaveBeenCalledTimes(4);
     });
   });
 });
 
-// TEST GET AVEC MOCK ET API
+// // TEST GET AVEC MOCK ET API
 describe("Giver i am a user connected as Employee", () => {
   describe("When i navigate to Bills", () => {
     test("fetches bills from mock API GET", async () => {
@@ -60,26 +65,26 @@ describe("Giver i am a user connected as Employee", () => {
   });
   describe("fetches bills from API deliver an error", () => {
     test("error should be 404 message error", async () => {
-      store.bills = jest.fn();
-      store.bills.mockImplementationOnce(() => {
+      store.bills = jest.fn().mockImplementationOnce(() => {
         return {
-          list : () =>  {
-            return Promise.reject(new Error("Erreur 404"))
-          }
-        }})
-      document.body.innerHTM = BillsUI({ error: "Erreur 404" })
+          list: () => {
+            return Promise.reject(new Error("Erreur 404"));
+          },
+        };
+      });
+      document.body.innerHTML = BillsUI({ error: "Erreur 404" });
       const message = await screen.getByText(/Erreur 404/);
       expect(message).toBeTruthy();
     });
     test("error should be 500 message error", async () => {
-      store.bills = jest.fn();
-      store.bills.mockImplementationOnce(() => {
+      store.bills = jest.fn().mockImplementationOnce(() => {
         return {
-          list : () =>  {
-            return Promise.reject(new Error("Erreur 500"))
-          }
-        }})
-      document.body.innerHTM = BillsUI({ error: "Erreur 500" })
+          list: () => {
+            return Promise.reject(new Error("Erreur 500"));
+          },
+        };
+      });
+      document.body.innerHTML = BillsUI({ error: "Erreur 500" });
       const message = await screen.getByText(/Erreur 500/);
       expect(message).toBeTruthy();
     });
