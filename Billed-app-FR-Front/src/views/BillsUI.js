@@ -9,10 +9,10 @@ const row = (bill) => {
     <tr>
       <td>${bill.type}</td>
       <td>${bill.name}</td>
-      <td>${bill.formatedDate}</td>
+      <td data-date="${bill.date}">${bill.formatedDate}</td>
       <td>${bill.amount} €</td>
       <td>${bill.status}</td>
-      <td>
+      <td data-testid='eye-icon' >
         ${Actions(bill.fileUrl)}
       </td>
     </tr>
