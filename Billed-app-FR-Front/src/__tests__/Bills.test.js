@@ -59,15 +59,28 @@ describe("Giver i am a user connected as Employee", () => {
     });
   });
   describe("fetches bills from API deliver an error", () => {
-    test("error should be 404 message", async () => {
-      jest.fn(() => {
-        
-      })
-      store.bills.list.mockImplementationOnce(() => {
-        return Promise.reject(new Error("Erreur 404"));
-      });
+    test("error should be 404 message error", async () => {
+      store.bills = jest.fn();
+      store.bills.mockImplementationOnce(() => {
+        return {
+          list : () =>  {
+            return Promise.reject(new Error("Erreur 404"))
+          }
+        }})
       document.body.innerHTM = BillsUI({ error: "Erreur 404" })
       const message = await screen.getByText(/Erreur 404/);
+      expect(message).toBeTruthy();
+    });
+    test("error should be 500 message error", async () => {
+      store.bills = jest.fn();
+      store.bills.mockImplementationOnce(() => {
+        return {
+          list : () =>  {
+            return Promise.reject(new Error("Erreur 500"))
+          }
+        }})
+      document.body.innerHTM = BillsUI({ error: "Erreur 500" })
+      const message = await screen.getByText(/Erreur 500/);
       expect(message).toBeTruthy();
     });
   });
