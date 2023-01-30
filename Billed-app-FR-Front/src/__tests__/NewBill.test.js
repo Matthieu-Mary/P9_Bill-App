@@ -46,11 +46,16 @@ describe("Given I am connected as an employee", () => {
         const fileToAdd = screen.getByTestId("file");
         fileToAdd.addEventListener("change", handleChangeFile);
         userEvent.upload(fileToAdd, {
-          file: new File(["hello"], "hello.png", { type: "png" }),
+          file: new File(["hello"], "hello.png", { type: "image/png" }),
         });
         const numberOfFiles = screen.getByTestId("file").files.length;
         expect(numberOfFiles).toEqual(1);
       });
     });
   });
+  // TEST POST
+  describe("")
 });
+
+
+
