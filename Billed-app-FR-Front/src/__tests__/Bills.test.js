@@ -13,17 +13,24 @@ import Bills from "../containers/Bills.js";
 import userEvent from "@testing-library/user-event";
 
 describe("Given I am connected as an employee", () => {
-  describe("When I am on Bills Page", () => {
+  Object.defineProperty(window, "localStorage", {
+    value: localStorageMock,
+  });
+  window.localStorage.setItem(
+    "user",
+    JSON.stringify({
+      type: "Employee",
+    })
+  );
+  describe("When I am on Bills Page and there's no bills", () => {
+    test("Then the table should be empty", () => {
+      document.body.innerHTML = BillsUI({ data: [] });
+      const wrapperTables = screen.getByTestId("tbody");
+      expect(wrapperTables.hasChildNodes()).toBe(false);
+    })
+  })
+  describe("When I am on Bills Page and there's bills", () => {
     test("Then bill icon in vertical layout should be highlighted", async () => {
-      Object.defineProperty(window, "localStorage", {
-        value: localStorageMock,
-      });
-      window.localStorage.setItem(
-        "user",
-        JSON.stringify({
-          type: "Employee",
-        })
-      );
       const root = document.createElement("div");
       root.setAttribute("id", "root");
       document.body.append(root);
@@ -68,7 +75,7 @@ describe("Given I am connected as an employee", () => {
       }
       // Simule un nouvel objet Bills 
       const currentBills = new Bills ({ document, onNavigate, store: store, localStorage: window.localStorage })
-      // Fonction simulée avec implémentation
+      // Fonction simulée avec implémentation du clique sur le bouton
       const handleClickNewBillTest = jest.fn((e) => currentBills.handleClickNewBill(e))
       const btnNewBill = screen.getByTestId("btn-new-bill");
       btnNewBill.addEventListener("click", handleClickNewBillTest)
