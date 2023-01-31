@@ -54,8 +54,26 @@ describe("Given I am connected as an employee", () => {
     });
   });
   // TEST POST
-  describe("")
+  describe("when user send new bill", () => {
+    test("Then new bill sould be post to mock", async () => {
+      const fakeBill = {
+        id: "BeKy5Mo4jkmdfPGdpza",
+        vat: "",
+        amount: 999,
+        name: "fake bill",
+        fileName: "1592770761.jpeg",
+        commentary: "Fake bill for test",
+        pct: 20,
+        type: "Transports",
+        email: "a@a",
+        fileUrl:
+          "https://test.storage.tld/v0/b/billable-677b6.a…61.jpeg?alt=media&token=7685cd61-c112-42bc-9929-8a799bb82d8b",
+        date: "2021-01-01",
+        status: "pending",
+        commentAdmin: "Ceci est un test ...",
+      };
+      const result = await store.bills().create(fakeBill);
+      expect(result).toBeTruthy();
+    });
+  });
 });
-
-
-
