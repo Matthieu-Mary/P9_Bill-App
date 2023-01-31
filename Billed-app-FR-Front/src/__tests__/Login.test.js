@@ -163,8 +163,8 @@ describe("Given that I am a user on login page", () => {
       document.body.innerHTML = LoginUI();
       const inputData = {
         type: "Admin",
-        email: "johndoe@email.com",
-        password: "azerty",
+        email: "admin@test.tld",
+        password: "admin",
         status: "connected",
       };
 
@@ -222,9 +222,8 @@ describe("Given that I am a user on login page", () => {
         })
       );
     });
-
     test("It should renders HR dashboard page", () => {
-      expect(screen.queryByText("Validations")).toBeTruthy();
+        expect(screen.queryByText("Validations")).toBeTruthy();
     });
   });
 });

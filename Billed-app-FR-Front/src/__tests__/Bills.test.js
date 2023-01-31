@@ -26,7 +26,7 @@ describe("Given I am connected as an employee", () => {
     test("Then the table should be empty", () => {
       document.body.innerHTML = BillsUI({ data: [] });
       const wrapperTables = screen.getByTestId("tbody");
-      expect(wrapperTables.hasChildNodes()).toBe(false);
+      expect(wrapperTables.children.length).toBe(0);
     })
   })
   describe("When I am on Bills Page and there's bills", () => {
@@ -85,7 +85,6 @@ describe("Given I am connected as an employee", () => {
     })
   });
 });
-
 // // TEST GET AVEC MOCK ET API
 describe("Giver i am a user connected as Employee", () => {
   describe("When i navigate to Bills", () => {
