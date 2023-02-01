@@ -9,7 +9,7 @@ import { localStorageMock } from "../__mocks__/localStorage.js";
 import store from "../__mocks__/store.js";
 import userEvent from "@testing-library/user-event";
 import router from "../app/Router.js";
-import { ROUTES_PATH } from "../constants/routes.js";
+import { ROUTES_PATH, ROUTES } from "../constants/routes.js";
 
 describe("Given I am connected as an employee", () => {
   Object.defineProperty(window, "localStorage", {
@@ -21,13 +21,13 @@ describe("Given I am connected as an employee", () => {
       type: "Employee",
     })
   );
+  const root = document.createElement("div");
+  root.setAttribute("id", "root");
+  document.body.append(root);
+  router();
+  window.onNavigate(ROUTES_PATH.NewBill);
   describe("When I am on NewBill Page", () => {
     test("Then newbill icon in vertical layout should be highlighted", async () => {
-      const root = document.createElement("div");
-      root.setAttribute("id", "root");
-      document.body.append(root);
-      router();
-      window.onNavigate(ROUTES_PATH.NewBill);
       const mailIcon = await waitFor(() => screen.getByTestId("icon-mail"));
       //to-do write expect expression
       const iconIsActive = mailIcon.classList.contains("active-icon");
@@ -73,6 +73,17 @@ describe("Given I am connected as an employee", () => {
         fileUrl: "https://localhost:3456/images/test.jpg",
         key: "1234",
       });
+    });
+    test("Then click on send form button should run handleSubmit event", async () => {
+      const formNewBill = await waitFor(() =>
+        screen.getByTestId("form-new-bill")
+      );
+      const handleSubmitNewBill = jest.fn();
+      formNewBill.handleSubmit = handleSubmitNewBill;
+      const submit = document.getElementById("btn-send-bill");
+      submit.addEventListener("click", handleSubmitNewBill);
+      userEvent.click(submit)
+      expect(handleSubmitNewBill).toHaveBeenCalled();
     });
   });
 });
