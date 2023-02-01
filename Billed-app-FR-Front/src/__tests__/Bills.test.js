@@ -22,6 +22,17 @@ describe("Given I am connected as an employee", () => {
       type: "Employee",
     })
   );
+  test("Then bill icon in vertical layout should be highlighted", async () => {
+    const root = document.createElement("div");
+    root.setAttribute("id", "root");
+    document.body.append(root);
+    router();
+    window.onNavigate(ROUTES_PATH.Bills);
+    const windowIcon = await waitFor(() => screen.getByTestId("icon-window"));
+    //to-do write expect expression
+    const iconIsActive = windowIcon.classList.contains("active-icon");
+    expect(iconIsActive).toBeTruthy();
+  });
   describe("When I am on Bills Page and there's no bills", () => {
     test("Then the table should be empty", () => {
       document.body.innerHTML = BillsUI({ data: [] });
@@ -30,18 +41,6 @@ describe("Given I am connected as an employee", () => {
     })
   })
   describe("When I am on Bills Page and there's bills", () => {
-    test("Then bill icon in vertical layout should be highlighted", async () => {
-      const root = document.createElement("div");
-      root.setAttribute("id", "root");
-      document.body.append(root);
-      router();
-      window.onNavigate(ROUTES_PATH.Bills);
-      await waitFor(() => screen.getByTestId("icon-window"));
-      const windowIcon = screen.getByTestId("icon-window");
-      //to-do write expect expression
-      const iconIsActive = windowIcon.classList.contains("active-icon");
-      expect(iconIsActive).toBeTruthy();
-    });
     test("Then bills should be ordered from earliest to latest", () => {
       document.body.innerHTML = BillsUI({ data: bills });
       const dates = screen.getAllByTestId(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map((a) => a.textContent); 

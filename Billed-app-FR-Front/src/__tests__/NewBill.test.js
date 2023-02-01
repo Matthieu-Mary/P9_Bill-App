@@ -2,12 +2,14 @@
  * @jest-environment jsdom
  */
 
-import { screen } from "@testing-library/dom";
+import { screen, waitFor } from "@testing-library/dom";
 import NewBillUI from "../views/NewBillUI.js";
 import NewBill from "../containers/NewBill.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import store from "../__mocks__/store.js";
 import userEvent from "@testing-library/user-event";
+import router from "../app/Router.js";
+import { ROUTES_PATH } from "../constants/routes.js";
 
 describe("Given I am connected as an employee", () => {
   Object.defineProperty(window, "localStorage", {
@@ -20,13 +22,23 @@ describe("Given I am connected as an employee", () => {
     })
   );
   describe("When I am on NewBill Page", () => {
-    beforeEach(() => {
-      document.body.innerHTML = NewBillUI();
+    test("Then newbill icon in vertical layout should be highlighted", async () => {
+      const root = document.createElement("div");
+      root.setAttribute("id", "root");
+      document.body.append(root);
+      router();
+      window.onNavigate(ROUTES_PATH.NewBill);
+      const mailIcon = await waitFor(() => screen.getByTestId("icon-mail"));
+      //to-do write expect expression
+      const iconIsActive = mailIcon.classList.contains("active-icon");
+      expect(iconIsActive).toBeTruthy();
     });
     test("Then newBill form should be display", () => {
+      document.body.innerHTML = NewBillUI();
       expect(screen.getByText("Envoyer une note de frais")).toBeTruthy();
     });
     test("Then all form elements should be display", () => {
+      document.body.innerHTML = NewBillUI();
       const form = screen.getByTestId("form-new-bill");
       expect(form.length).toEqual(9);
     });
@@ -56,9 +68,11 @@ describe("Given I am connected as an employee", () => {
   // TEST POST
   describe("when user send new bill", () => {
     test("Then new bill sould be post to mock", async () => {
-      const result = await store.bills().create();
-      console.log(result)
-      expect(result).toStrictEqual({fileUrl: 'https://localhost:3456/images/test.jpg', key: '1234'});
+      const result = await waitFor(() => store.bills().create());
+      expect(result).toStrictEqual({
+        fileUrl: "https://localhost:3456/images/test.jpg",
+        key: "1234",
+      });
     });
   });
 });
